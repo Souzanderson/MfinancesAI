@@ -24,11 +24,13 @@ class MensagemRequest(BaseModel):
 class ResultadoResponse(BaseModel):
     items: Optional[List[Any]] = None
     totais: Optional[Any] = None
+    error: Optional[Any] = None
 
 @app.post("/classificar", response_model=ResultadoResponse)
-
 def classificar(mensagem_request: MensagemRequest):
     resultado = classificar_transacao(mensagem_request.mensagem, user="Anderson")
+    if "error" in resultado:
+        return {"items": [], "totais": None, "error": resultado["error"]}
     if "item" in resultado:
         item = Item.from_json(resultado)  # Valida e converte o resultado para Item
         response = item.distribuir_parcelas_e_inserir()  # Insere no banco de dados

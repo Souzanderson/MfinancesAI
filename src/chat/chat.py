@@ -32,7 +32,6 @@ def classificar_transacao(message_received: str, user:str) -> dict:
         thread_id=thread.id,
         role="user",
         content=f"{message_context}\n\n{message_received}",
-        metadata={"user": user, "context": message_context}
     )
     # Executa o assistente com base no thread
     run = openai.beta.threads.runs.create(

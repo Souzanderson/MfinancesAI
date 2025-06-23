@@ -53,8 +53,8 @@ class Item(BaseModel):
 
         receitas = sum(row["total"] / row["parcelas"] for row in results if row["natureza"] == "entrada" and row["parcelas"])
         despesas = sum(row["total"] / row["parcelas"] for row in results if row["natureza"] == "saida" and row["parcelas"])
-
-        return {"receitas": receitas, "despesas": despesas, "month": month, "year": year}
+        deficit = receitas - despesas
+        return {"receitas": receitas, "despesas": despesas, "deficit": deficit, "month": month, "year": year}
 
     def distribuir_parcelas_e_inserir(self, db_config: dict = DATABASE_CONFIG):
         if not self.date_create:

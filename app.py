@@ -12,6 +12,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.repository.user import User
 from fastapi import HTTPException
 
+from src.middlewares.bearer_middleware import BearerTokenAuth
+from fastapi import Depends
+
+auth_scheme = BearerTokenAuth(auto_error=True)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4200"],
@@ -29,9 +34,13 @@ class ResultadoResponse(BaseModel):
     error: Optional[Any] = None
     
 @app.post("/classificar", response_model=ResultadoResponse)
-def classificar(mensagem_request: MensagemRequest):
+def classificar(
+    mensagem_request: MensagemRequest,
+    token: str = Depends(auth_scheme)
+):
     try:
-        resultado = classificar_transacao(mensagem_request.mensagem, user="Anderson")
+        # print(f"[INFO] token: {token}")
+        resultado = classificar_transacao(mensagem_request.mensagem, user=token)
         if "error" in resultado:
             return {"items": [], "totais": None, "error": resultado["error"]}
         if "item" in resultado:

@@ -6,7 +6,7 @@ MfinancesAI is a backend service designed to assist with financial management an
 
 - Automated financial data processing
 - AI-driven insights and analytics
-- RESTful API for integration with other services
+- REST API for integration with other services
 - Secure authentication and authorization
 
 ## Getting Started

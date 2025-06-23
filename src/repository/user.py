@@ -1,13 +1,8 @@
-from pydantic import BaseModel, Field
 import mysql.connector
 from settings import DATABASE_CONFIG
 from hashlib import sha1
 
-class User(BaseModel):
-    id: int | None = Field(default=None, alias="id")
-    username: str = Field(..., alias="username")
-    password: str = Field(..., alias="password")  # Store hashed passwords
-
+class User():
     @staticmethod
     def hash_password(login:str, password: str) -> str:
         """Hashes a password using SHA-1."""
@@ -33,3 +28,23 @@ class User(BaseModel):
             return {"hashkey": user["hashkey"], "id": user["id"], "username": user["username"]}
         else:
             return {"error": "Invalid username or password"}
+        
+    @staticmethod
+    def is_user(hashkey:str, db_config: dict = DATABASE_CONFIG):
+        """Authenticates a user by username and password."""
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor(dictionary=True)
+        query = """
+            SELECT id
+            FROM users
+            WHERE hashkey = %s
+        """
+        cursor.execute(query, (hashkey,))
+        user = cursor.fetchone()
+        cursor.close()
+        connection.close()
+
+        if user and user["id"]:
+            return True
+        else:
+            return False

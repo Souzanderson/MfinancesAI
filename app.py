@@ -9,6 +9,9 @@ from datetime import datetime
 from typing import Optional, List, Any
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.repository.user import User
+from fastapi import HTTPException
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4200"],
@@ -20,12 +23,11 @@ app.add_middleware(
 class MensagemRequest(BaseModel):
     mensagem: str = Field(..., alias="message")
     
-
 class ResultadoResponse(BaseModel):
     items: Optional[List[Any]] = None
     totais: Optional[Any] = None
     error: Optional[Any] = None
-
+    
 @app.post("/classificar", response_model=ResultadoResponse)
 def classificar(mensagem_request: MensagemRequest):
     try:
@@ -69,4 +71,15 @@ def classificar(mensagem_request: MensagemRequest):
     except Exception as e:
         print(f"[ERROR] Error:  => ", e)
         return {"items": [], "totais": None, "error": "Erro ao processar a mensagem!"}
+
+class LoginRequest(BaseModel):
+    username: str = Field(..., alias="username")
+    password: str = Field(..., alias="password")
+
+@app.post("/login")
+def login(login_request: LoginRequest):
+    response = User.login(**login_request.dict())
+    if "error" in response:
+        raise HTTPException(status_code=401, detail=response["error"])
     
+    return response

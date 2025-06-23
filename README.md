@@ -16,28 +16,45 @@ MfinancesAI is a backend service designed to assist with financial management an
 - Python 3.10+
 - [uv](https://github.com/astral-sh/uv) for fast Python package management (as an alternative to Poetry)
 
-### Installation
+### Running Migration
+
+- Create migration file migrate.sh and permissions to run:
 
 ```bash
-git clone https://github.com/yourusername/mfinancesai.git
-cd mfinancesai
-poetry install
+#!/bin/bash
+
+cd ~/your_path_project/
+export OPENAI_API_KEY=open_ai_key
+export OPENAI_API_ASSISTENT_KEY=open_ai_assistent
+export DB_HOST=host_db
+export DB_PORT=port_db
+export DB_NAME=basefinancechat
+export DB_USER=user_db
+export DB_PASSWORD=pass_db
+export DB_SSLMODE=disable
+
+./.venv/bin/python migrate.py
 ```
 
 ### Running the Application
 
+- Create runing file run.sh and permissions to run:
+
 ```bash
-poetry run python main.py
+#!/bin/bash
+
+cd ~/your_path_project/
+export OPENAI_API_KEY=open_ai_key
+export OPENAI_API_ASSISTENT_KEY=open_ai_assistent
+export DB_HOST=host_db
+export DB_PORT=port_db
+export DB_NAME=basefinancechat
+export DB_USER=user_db
+export DB_PASSWORD=pass_db
+export DB_SSLMODE=disable
+
+./.venv/bin/python server.py
 ```
-
-## API Documentation
-
-API documentation is available at `/docs` when running the service.
-
-## Contributing
-
-Contributions are welcome! Please open issues or submit pull requests.
-
 ## License
 
 This project is licensed under the MIT License.

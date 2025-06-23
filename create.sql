@@ -18,7 +18,8 @@ create table if not exists users (
     username varchar(255) not null,
     hashkey varchar(255) not null,
     date_create datetime not null default current_timestamp, 
-    unique key unique_name_hashkey (username, hashkey)
+    unique key unique_name_hashkey (username, hashkey),
+    unique key unique_name (username)
 );
 
-insert into users (username, hashkey) values ('anderson', '37664a95918e6e6640cec08ac708b5d91b456f63');
+insert into users (username, hashkey) values ('user', '8fb5cfe922674e0f9faa46a92716f66bd67ad344');

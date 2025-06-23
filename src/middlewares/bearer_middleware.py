@@ -9,7 +9,7 @@ class BearerTokenAuth(HTTPBearer):
     async def __call__(self, request: Request) -> str:
         credentials: HTTPAuthorizationCredentials = await super().__call__(request)
         if not credentials or credentials.scheme != "Bearer":
-            raise HTTPException(status_code=401, detail="Invalid or missing token")
+            raise HTTPException(status_code=404, detail="Invalid or missing token")
 
         token = credentials.credentials
         if not User.is_user(token):

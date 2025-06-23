@@ -46,5 +46,23 @@ class User():
 
         if user and user["id"]:
             return True
-        else:
-            return False
+        return False
+    
+    @staticmethod
+    def id_user(hashkey:str, db_config: dict = DATABASE_CONFIG):
+        """Authenticates a user by username and password."""
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor(dictionary=True)
+        query = """
+            SELECT id
+            FROM users
+            WHERE hashkey = %s
+        """
+        cursor.execute(query, (hashkey,))
+        user = cursor.fetchone()
+        cursor.close()
+        connection.close()
+
+        if user and user["id"]:
+            return user["id"]
+        return None

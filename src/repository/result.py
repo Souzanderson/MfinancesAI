@@ -12,37 +12,41 @@ class Item(BaseModel):
     parcelado: bool = Field(..., alias="parcelado")
     parcelas: int = Field(None, alias="parcelas")
     parcela_atual: int = Field(None, alias="parcela_atual")
+    user_id: int | None = Field(default=None, alias="user_id")
     valor_parcela_atual: float | None = Field(default=0.0, alias="valor_parcela_atual")
     date_create: datetime | None = Field(default=datetime.now(), alias="date_create")
 
     @staticmethod
-    def from_json(data: dict):
+    def from_json(data: dict, user_id):
+        data["user_id"] = user_id
         return Item(**data)
     
     @staticmethod
-    def get_by_month_year(month: int, year: int, db_config: dict = DATABASE_CONFIG):
+    def get_by_month_year(month: int, year: int, user_id, db_config: dict = DATABASE_CONFIG):
         connection = mysql.connector.connect(**db_config)
         cursor = connection.cursor(dictionary=True)
         query = """
             SELECT * FROM items
             WHERE MONTH(date_create) = %s AND YEAR(date_create) = %s
+            AND user_id = %s
         """
-        cursor.execute(query, (month, year))
+        cursor.execute(query, (month, year, user_id))
         results = cursor.fetchall()
         cursor.close()
         connection.close()
-        return [Item.from_json(row) for row in results]
+        return [Item.from_json(row, user_id) for row in results]
     
     @staticmethod
-    def get_receitas_despesas_by_month_year(month: int, year: int, db_config: dict = DATABASE_CONFIG ):
+    def get_receitas_despesas_by_month_year(month: int, year: int, user_id, db_config: dict = DATABASE_CONFIG ):
         connection = mysql.connector.connect(**db_config)
         cursor = connection.cursor(dictionary=True)
         query = """
             SELECT natureza, total, parcelas
             FROM items
             WHERE MONTH(date_create) = %s AND YEAR(date_create) = %s
+            AND user_id = %s
         """
-        cursor.execute(query, (month, year))
+        cursor.execute(query, (month, year, user_id))
         results = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -75,14 +79,15 @@ class Item(BaseModel):
                     "parcelas": self.parcelas,
                     "parcela_atual": parcela,
                     "valor_parcela_atual": valor_parcela_atual,
-                    "date_create": parcela_data.strftime('%Y-%m-%d %H:%M:%S')
+                    "date_create": parcela_data.strftime('%Y-%m-%d %H:%M:%S'),
+                    "user_id": self.user_id
                 }
                 parcela_data += timedelta(days=30)  # Adiciona 30 dias para cada parcela
                 items_parcelas.append(item_parcela)
                 cursor.execute(
                     """
-                    INSERT INTO items (item, qtd, total, natureza, parcelado, parcelas, parcela_atual, valor_parcela_atual, date_create)
-                    VALUES (%(item)s, %(qtd)s, %(total)s, %(natureza)s, %(parcelado)s, %(parcelas)s, %(parcela_atual)s, %(valor_parcela_atual)s, %(date_create)s)
+                    INSERT INTO items (item, qtd, total, natureza, parcelado, parcelas, parcela_atual, valor_parcela_atual, date_create, user_id)
+                    VALUES (%(item)s, %(qtd)s, %(total)s, %(natureza)s, %(parcelado)s, %(parcelas)s, %(parcela_atual)s, %(valor_parcela_atual)s, %(date_create)s, %(user_id)s)
                     """,
                     item_parcela
                 )
@@ -98,8 +103,8 @@ class Item(BaseModel):
             self.valor_parcela_atual = self.total 
             cursor.execute(
                     """
-                    INSERT INTO items (item, qtd, total, natureza, parcelado, parcelas, parcela_atual, valor_parcela_atual, date_create)
-                    VALUES (%(item)s, %(qtd)s, %(total)s, %(natureza)s, %(parcelado)s, %(parcelas)s, %(parcela_atual)s, %(valor_parcela_atual)s, %(date_create)s)
+                    INSERT INTO items (item, qtd, total, natureza, parcelado, parcelas, parcela_atual, valor_parcela_atual, date_create, user_id)
+                    VALUES (%(item)s, %(qtd)s, %(total)s, %(natureza)s, %(parcelado)s, %(parcelas)s, %(parcela_atual)s, %(valor_parcela_atual)s, %(date_create)s, %(user_id)s)
                     """,
                     self.dict()
                 )

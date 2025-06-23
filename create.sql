@@ -9,6 +9,7 @@ create table if not exists items (
     parcelado boolean not null,
     parcelas int,
     parcela_atual int, 
+    user_id int not null,
     valor_parcela_atual decimal(10,2) not null,
     date_create datetime not null default current_timestamp
 );

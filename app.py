@@ -40,11 +40,12 @@ def classificar(
 ):
     try:
         # print(f"[INFO] token: {token}")
+        user_id = User.id_user(token)
         resultado = classificar_transacao(mensagem_request.mensagem, user=token)
         if "error" in resultado:
             return {"items": [], "totais": None, "error": resultado["error"]}
         if "item" in resultado:
-            item = Item.from_json(resultado)  # Valida e converte o resultado para Item
+            item = Item.from_json(resultado, user_id)  # Valida e converte o resultado para Item
             response = item.distribuir_parcelas_e_inserir()  # Insere no banco de dados
             return {"items": response}
         
@@ -66,13 +67,15 @@ def classificar(
             if "istotal" in resultado:
                 item = Item.get_receitas_despesas_by_month_year(
                     month=mes_num,
-                    year=ano
+                    year=ano, 
+                    user_id=user_id
                 )
                 return {"totais": item}
             
             item = Item.get_by_month_year(
                 month=mes_num,
-                year=ano
+                year=ano,
+                user_id=user_id
             )
 
             return {"items": [item.dict() for item in item]}  # Retorna os itens encontrados

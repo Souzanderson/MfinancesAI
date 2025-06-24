@@ -2,6 +2,7 @@ import mysql.connector
 from settings import DATABASE_CONFIG
 
 def migrate():
+    
     # Read and split SQL statements
     with open('./create.sql', 'r', encoding='utf-8') as f:
         sql_content = f.read()

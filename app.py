@@ -19,7 +19,7 @@ auth_scheme = BearerTokenAuth(auto_error=True)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "http://mfit.malbizer.com.br/", "https://mfit.malbizer.com.br/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

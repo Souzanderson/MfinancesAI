@@ -14,16 +14,26 @@ from fastapi import HTTPException
 
 from src.middlewares.bearer_middleware import BearerTokenAuth
 from fastapi import Depends
+from settings import IS_PROD
 
 auth_scheme = BearerTokenAuth(auto_error=True)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:4200", "http://mfit.malbizer.com.br/", "https://mfit.malbizer.com.br/"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+if IS_PROD:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins in development
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 class MensagemRequest(BaseModel):
     mensagem: str = Field(..., alias="message")
